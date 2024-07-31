@@ -1,26 +1,68 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { PrismaService } from 'src/database/prisma.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { Account } from './entities/account.entity';
 
 @Injectable()
 export class AccountsService {
-  create(createAccountDto: CreateAccountDto) {
-    return 'This action adds a new account';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createAccountDto: CreateAccountDto) {
+    await this.findUniqueUsername(createAccountDto.username);
+    const account = new Account();
+    Object.assign(account, {
+      ...createAccountDto,
+    });
+    await this.prisma.account.create({ data: { ...account } });
+    return plainToInstance(Account, account);
   }
 
-  findAll() {
-    return `This action returns all accounts`;
+  async findAll() {
+    const accounts = await this.prisma.account.findMany();
+    return plainToInstance(Account, accounts);
   }
 
-  findOne(id: number) {
+  async findOne(id: string) {
     return `This action returns a #${id} account`;
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  async update(id: string, updateAccountDto: UpdateAccountDto) {
+    await this.findAccountOrError(id);
+    if (updateAccountDto.username)
+      await this.findUniqueUsername(updateAccountDto.username);
+    const updateAccount = await this.prisma.account.update({
+      where: { id },
+      data: { ...updateAccountDto },
+    });
+    return plainToInstance(Account, updateAccount);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} account`;
+  async remove(id: string) {
+    await this.findAccountOrError(id);
+    await this.prisma.account.delete({ where: { id } });
+  }
+
+  async findByUsername(username: string) {
+    const account = await this.prisma.account.findUnique({
+      where: { username },
+    });
+    return account;
+  }
+
+  async findUniqueUsername(dtoUsername: string) {
+    const findAccount = await this.findByUsername(dtoUsername);
+    if (findAccount) throw new ConflictException('User name already exists');
+  }
+
+  async findAccountOrError(id: string) {
+    const account = await this.prisma.account.findUnique({ where: { id } });
+    if (!account) throw new NotFoundException('Account not found');
+    return account;
   }
 }
