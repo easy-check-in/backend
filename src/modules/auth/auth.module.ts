@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { Passport } from 'passport';
-import { AccountsService } from '../accounts/accounts.service';
+import { AccountsModule } from '../accounts/accounts.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    AccountsService,
+    AccountsModule,
     Passport,
     JwtModule.register({
       secret: process.env.SECRET_KEY,
