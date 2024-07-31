@@ -12,3 +12,62 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Account {
+  id       String  @id @default(uuid())
+  username String  @unique
+  password String
+  hotels   Hotel[]
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("_createdAt")
+
+  @@map("accounts")
+}
+
+model Hotel {
+  id        String  @id @default(uuid())
+  name      String
+  crn       String
+  email     String
+  phone     String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+  rooms     Room[]
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("_createdAt")
+
+  @@map("hotels")
+}
+
+model Room {
+  id                Int           @id @default(autoincrement())
+  capacity          String
+  price             Float
+  extraPersonCharge Float
+  hotel             Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  hotelId           String
+  reservations      Reservation[]
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("_createdAt")
+
+  @@map("rooms")
+}
+
+model Reservation {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  startDate DateTime
+  endDate   DateTime
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId    Int
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("_createdAt")
+
+  @@map("reservations")
+}
