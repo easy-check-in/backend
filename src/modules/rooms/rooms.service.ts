@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
+import { PrismaService } from 'src/database/prisma.service';
+import { plainToInstance } from 'class-transformer';
+import { Room } from './entities/room.entity';
 
 @Injectable()
 export class RoomsService {
-  create(createRoomDto: CreateRoomDto) {
-    return 'This action adds a new room';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createRoomDto: CreateRoomDto) {
+    const room = new Room();
+    Object.assign(room, {
+      ...createRoomDto,
+    });
+    await this.prisma.room.create({ data: { ...room } });
+    return plainToInstance(Room, room);
   }
 
-  findAll() {
-    return `This action returns all rooms`;
+  async findAll() {
+    const rooms = await this.prisma.room.findMany();
+    return plainToInstance(Room, rooms);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} room`;
+  async findOne(id: number) {
+    const room = await this.prisma.room.findUnique({
+      where: { id: id },
+    });
+    return plainToInstance(Room, room);
   }
 
-  update(id: number, updateRoomDto: UpdateRoomDto) {
-    return `This action updates a #${id} room`;
+  async update(id: number, updateRoomDto: UpdateRoomDto) {
+    const updateRoom = await this.prisma.room.update({
+      where: { id },
+      data: { ...updateRoomDto },
+    });
+    return plainToInstance(Room, updateRoom);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} room`;
+  async remove(id: number) {
+    await this.prisma.room.delete({ where: { id } });
   }
 }

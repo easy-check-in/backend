@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { Reservation } from './entities/reservation.entity';
+import { plainToInstance } from 'class-transformer';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class ReservationsService {
-  create(createReservationDto: CreateReservationDto) {
-    return 'This action adds a new reservation';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createReservationDto: CreateReservationDto) {
+    const reservation = new Reservation();
+    Object.assign(reservation, {
+      ...createReservationDto,
+    });
+    await this.prisma.reservation.create({ data: { ...reservation } });
+    return plainToInstance(Reservation, reservation);
   }
 
-  findAll() {
-    return `This action returns all reservations`;
+  async findAll() {
+    const reservations = await this.prisma.reservation.findMany();
+    return plainToInstance(Reservation, reservations);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} reservation`;
+  async findOne(id: string) {
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: id },
+    });
+    return plainToInstance(Reservation, reservation);
   }
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
-    return `This action updates a #${id} reservation`;
+  async update(id: string, updateReservationDto: UpdateReservationDto) {
+    const updateReservation = await this.prisma.reservation.update({
+      where: { id },
+      data: { ...updateReservationDto },
+    });
+    return plainToInstance(Reservation, updateReservation);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} reservation`;
+  async remove(id: string) {
+    await this.prisma.reservation.delete({ where: { id } });
   }
 }
