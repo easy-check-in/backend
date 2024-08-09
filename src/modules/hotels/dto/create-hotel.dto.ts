@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateHotelDto {
   @ApiProperty({
@@ -33,4 +33,7 @@ export class CreateHotelDto {
   @IsNotEmpty()
   @IsString()
   phone: string;
+  @IsNotEmpty()
+  @IsUUID()
+  accountId: string;
 }

@@ -1,3 +1,5 @@
+import { Account, Room } from '@prisma/client';
+
 export class Hotel {
   id: string;
   name: string;
@@ -7,4 +9,6 @@ export class Hotel {
   accountId: string;
   updatedAt: string;
   createdAt: string;
+  account: Account;
+  rooms: Room[];
 }
