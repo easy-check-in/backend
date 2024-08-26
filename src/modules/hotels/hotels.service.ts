@@ -23,7 +23,7 @@ export class HotelsService {
     return await this.findHotelOrError(accountId);
   }
 
-  async update(accountId: string, updateHotelDto: UpdateHotelDto) {
+  async update(updateHotelDto: UpdateHotelDto, accountId: string) {
     await this.findHotelOrError(accountId);
     return await this.prisma.hotel.update({
       where: { accountId },

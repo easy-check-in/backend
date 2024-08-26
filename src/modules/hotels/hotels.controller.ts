@@ -3,11 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { CreateHotelDto } from './dto/create-hotel.dto';
@@ -34,19 +33,15 @@ export class HotelsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(
-    @Param('id') id: string,
-    @Body() updateHotelDto: UpdateHotelDto,
-    @Req() req,
-  ) {
+  update(@Body() updateHotelDto: UpdateHotelDto, @Req() req) {
     const accountId = req.user.id;
-    return this.hotelsService.update(id, updateHotelDto, accountId);
+    return this.hotelsService.update(updateHotelDto, accountId);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string, @Req() req) {
+  remove(@Req() req) {
     const accountId = req.user.id;
-    return this.hotelsService.remove(id, accountId);
+    return this.hotelsService.remove(accountId);
   }
 }
