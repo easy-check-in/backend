@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -19,10 +20,11 @@ export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  create(@Body() createReservationDto: CreateReservationDto, @Req() req) {
-    const accountId = req.user.id;
-    return this.reservationsService.create(createReservationDto, accountId);
+  create(
+    @Query('categoryId') categoryId: string,
+    @Body() createReservationDto: CreateReservationDto,
+  ) {
+    return this.reservationsService.create(createReservationDto, categoryId);
   }
 
   @Get()
@@ -33,10 +35,8 @@ export class ReservationsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string, @Req() req) {
-    const accountId = req.user.id;
-    return this.reservationsService.findOne(id, accountId);
+  findOne(@Param('id') id: string) {
+    return this.reservationsService.findOne(id);
   }
 
   @Patch(':id')

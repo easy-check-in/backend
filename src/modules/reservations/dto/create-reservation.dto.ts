@@ -44,11 +44,4 @@ export class CreateReservationDto {
   @IsDate()
   @Type(() => Date)
   endDate: Date;
-
-  @ApiProperty({
-    description: 'Room ID associated with the reservation',
-    example: 1,
-  })
-  @IsNotEmpty()
-  roomId: number;
 }

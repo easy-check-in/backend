@@ -1,60 +1,107 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
+import { HotelsService } from '../hotels/hotels.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 
 @Injectable()
 export class ReservationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private hotelService: HotelsService,
+  ) {}
 
-  async create(createReservationDto: CreateReservationDto, accountId: string) {
-    const hotel = await this.prisma.hotel.findUnique({
-      where: { accountId },
-      include: { rooms: true },
-    });
-    if (!hotel) {
-      throw new NotFoundException('Hotel not found for this account');
-    }
-
-    const room = hotel.rooms.find(
-      (room) => room.id === createReservationDto.roomId,
-    );
-    if (!room) {
-      throw new NotFoundException('Room not found in the hotel');
-    }
-
-    const reservation = await this.prisma.reservation.create({
-      data: {
-        ...createReservationDto,
-        room: {
-          connect: { id: createReservationDto.roomId },
+  async create(createReservationDto: CreateReservationDto, categoryId: string) {
+    const { startDate, endDate } = createReservationDto;
+    const room = await this.prisma.room.findFirst({
+      where: {
+        categoryId,
+        reservations: {
+          none: {
+            OR: [
+              {
+                startDate: { lte: endDate },
+                endDate: { gte: startDate },
+              },
+            ],
+          },
         },
       },
     });
-    return reservation;
+
+    if (!room) {
+      throw new BadRequestException(
+        'No available rooms for the selected dates',
+      );
+    }
+
+    return await this.prisma.reservation.create({
+      data: {
+        ...createReservationDto,
+        roomId: room.id,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all reservations`;
+  async findAll(accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    return await this.prisma.reservation.findMany({
+      where: {
+        room: {
+          hotelId: hotel.id,
+        },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} reservation`;
+  async findOne(id: string) {
+    return await this.findReservationOrError(id);
   }
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
-    return `This action updates a #${id} reservation`;
+  async update(
+    id: string,
+    updateReservationDto: UpdateReservationDto,
+    accountId: string,
+  ) {
+    await this.checkReservationPermission(id, accountId);
+    return await this.prisma.reservation.update({
+      where: { id },
+      data: updateReservationDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} reservation`;
+  async remove(id: string, accountId: string) {
+    await this.checkReservationPermission(id, accountId);
+    return await this.prisma.reservation.delete({
+      where: { id },
+    });
   }
 
   async findReservationOrError(id: string) {
-    const reservation = await this.prisma.reservation.findUnique({
+    const reservation = await this.prisma.reservation.findFirst({
       where: { id },
     });
     if (!reservation) throw new NotFoundException('Reservation not found');
     return reservation;
+  }
+
+  async checkReservationPermission(id: string, accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    const reservation = await this.findReservationOrError(id);
+
+    const room = await this.prisma.room.findUnique({
+      where: { id: reservation.roomId },
+      include: { hotel: true },
+    });
+
+    if (room.hotelId !== hotel.id) {
+      throw new BadRequestException(
+        'You do not have permission to access this reservation',
+      );
+    }
   }
 }
