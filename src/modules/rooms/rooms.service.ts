@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
+import { HotelsService } from '../hotels/hotels.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
 export class RoomsService {
-  create(createRoomDto: CreateRoomDto) {
-    return 'This action adds a new room';
+  constructor(
+    private prisma: PrismaService,
+    private hotelService: HotelsService,
+  ) {}
+
+  async create(createRoomDto: CreateRoomDto, accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    return await this.prisma.room.create({
+      data: {
+        ...createRoomDto,
+        hotelId: hotel.id,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all rooms`;
+  async findAll(accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    return await this.prisma.room.findMany({
+      where: { hotelId: hotel.id },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} room`;
+  async findOne(id: string, accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    return await this.findRoomOrError(id, hotel.id);
   }
 
-  update(id: number, updateRoomDto: UpdateRoomDto) {
-    return `This action updates a #${id} room`;
+  async update(id: string, updateRoomDto: UpdateRoomDto, accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    const room = await this.findRoomOrError(id, hotel.id);
+
+    return await this.prisma.room.update({
+      where: { id: room.id },
+      data: updateRoomDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} room`;
+  async remove(id: string, accountId: string) {
+    const hotel = await this.hotelService.findHotelOrError(accountId);
+    const room = await this.findRoomOrError(id, hotel.id);
+
+    return await this.prisma.room.delete({
+      where: { id: room.id },
+    });
+  }
+
+  async findRoomOrError(id: string, hotelId: string) {
+    const room = await this.prisma.room.findFirst({
+      where: { id, hotelId },
+    });
+    if (!room) throw new NotFoundException('Room not found');
+    return room;
   }
 }
