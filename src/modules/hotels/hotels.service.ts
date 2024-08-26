@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
+import { Hotel } from './entities/hotel.entity';
 
 @Injectable()
 export class HotelsService {
-  create(createHotelDto: CreateHotelDto) {
-    return 'This action adds a new hotel';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createHotelDto: CreateHotelDto, accountId: string) {
+    const hotel = new Hotel();
+    Object.assign(hotel, {
+      ...createHotelDto,
+      accountId,
+    });
+    const createdHotel = await this.prisma.hotel.create({
+      data: hotel,
+    });
+
+    return createdHotel;
   }
 
-  findAll() {
-    return `This action returns all hotels`;
+  async findAll() {
+    return await this.prisma.hotel.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hotel`;
+  async findOne(id: string) {
+    return await this.findHotelOrError(id);
   }
 
-  update(id: number, updateHotelDto: UpdateHotelDto) {
-    return `This action updates a #${id} hotel`;
+  async update(id: string, updateHotelDto: UpdateHotelDto) {
+    await this.findHotelOrError(id);
+    const updatedHotel = await this.prisma.hotel.update({
+      where: { id },
+      data: { ...updateHotelDto },
+    });
+    return updatedHotel;
   }
 
-  remove(id: number) {
+  async remove(id: string) {
     return `This action removes a #${id} hotel`;
+  }
+
+  async findHotelOrError(id: string) {
+    const hotel = await this.prisma.hotel.findUnique({ where: { id } });
+    if (!hotel) throw new NotFoundException('Hotel not found');
+    return hotel;
   }
 }

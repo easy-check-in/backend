@@ -13,11 +13,11 @@ export class AuthService {
   async login({ username, password }: LoginDto) {
     const account = await this.accountService.findByUsername(username);
     if (!account) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid username or password');
     }
     const passwordMatch = await compare(password, account.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid username or password');
     }
 
     return {

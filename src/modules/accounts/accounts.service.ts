@@ -29,7 +29,7 @@ export class AccountsService {
   }
 
   async findOne(id: string) {
-    return `This action returns a #${id} account`;
+    return await this.findAccountOrError(id);
   }
 
   async update(id: string, updateAccountDto: UpdateAccountDto) {
@@ -49,10 +49,9 @@ export class AccountsService {
   }
 
   async findByUsername(username: string) {
-    const account = await this.prisma.account.findUnique({
+    return await this.prisma.account.findUnique({
       where: { username },
     });
-    return account;
   }
 
   async findUniqueUsername(dtoUsername: string) {
