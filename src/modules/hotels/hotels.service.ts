@@ -14,11 +14,9 @@ export class HotelsService {
       ...createHotelDto,
       accountId,
     });
-    const createdHotel = await this.prisma.hotel.create({
+    return await this.prisma.hotel.create({
       data: hotel,
     });
-
-    return createdHotel;
   }
 
   async findAll() {
@@ -39,7 +37,8 @@ export class HotelsService {
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} hotel`;
+    await this.findHotelOrError(id);
+    await this.prisma.hotel.delete({ where: { id } });
   }
 
   async findHotelOrError(id: string) {
