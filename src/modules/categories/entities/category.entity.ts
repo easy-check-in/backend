@@ -1,9 +1,8 @@
-export class Room {
+export class Category {
   id: string;
   capacity: string;
   price: number;
   extraPersonCharge: number;
-  hotelId: string;
   updatedAt: Date;
   createdAt: Date;
 }

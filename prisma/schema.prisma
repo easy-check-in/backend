@@ -25,16 +25,17 @@ model Account {
 }
 
 model Hotel {
-  id        String   @id @default(uuid())
-  name      String
-  crn       String
-  email     String
-  phone     String
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId String   @unique
-  rooms     Room[]
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now()) @map("_createdAt")
+  id         String     @id @default(uuid())
+  name       String
+  crn        String
+  email      String
+  phone      String
+  account    Account    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId  String     @unique
+  rooms      Room[]
+  categories Category[]
+  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime   @default(now()) @map("_createdAt")
 
   @@map("hotels")
 }
@@ -57,6 +58,8 @@ model Category {
   capacity          String
   price             Float
   extraPersonCharge Float
+  hotel             Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  hotelId           String
   rooms             Room[]
   updatedAt         DateTime @updatedAt
   createdAt         DateTime @default(now()) @map("_createdAt")

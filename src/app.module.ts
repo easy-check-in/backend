@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { HotelsModule } from './modules/hotels/hotels.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { RoomsModule } from './modules/rooms/rooms.module';
     HotelsModule,
     RoomsModule,
     ReservationsModule,
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],
