@@ -27,25 +27,26 @@ export class HotelsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.hotelsService.findAll();
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.hotelsService.findOne(id);
+  findOne(@Req() req) {
+    const accountId = req.user.id;
+    return this.hotelsService.findOne(accountId);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateHotelDto: UpdateHotelDto) {
-    return this.hotelsService.update(id, updateHotelDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateHotelDto: UpdateHotelDto,
+    @Req() req,
+  ) {
+    const accountId = req.user.id;
+    return this.hotelsService.update(id, updateHotelDto, accountId);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string) {
-    return this.hotelsService.remove(id);
+  remove(@Param('id') id: string, @Req() req) {
+    const accountId = req.user.id;
+    return this.hotelsService.remove(id, accountId);
   }
 }

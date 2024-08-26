@@ -19,30 +19,27 @@ export class HotelsService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.hotel.findMany();
+  async findOne(accountId: string) {
+    return await this.findHotelOrError(accountId);
   }
 
-  async findOne(id: string) {
-    return await this.findHotelOrError(id);
-  }
-
-  async update(id: string, updateHotelDto: UpdateHotelDto) {
-    await this.findHotelOrError(id);
-    const updatedHotel = await this.prisma.hotel.update({
-      where: { id },
+  async update(accountId: string, updateHotelDto: UpdateHotelDto) {
+    await this.findHotelOrError(accountId);
+    return await this.prisma.hotel.update({
+      where: { accountId },
       data: { ...updateHotelDto },
     });
-    return updatedHotel;
   }
 
-  async remove(id: string) {
-    await this.findHotelOrError(id);
-    await this.prisma.hotel.delete({ where: { id } });
+  async remove(accountId: string) {
+    await this.findHotelOrError(accountId);
+    await this.prisma.hotel.delete({ where: { accountId } });
   }
 
-  async findHotelOrError(id: string) {
-    const hotel = await this.prisma.hotel.findUnique({ where: { id } });
+  async findHotelOrError(accountId: string) {
+    const hotel = await this.prisma.hotel.findUnique({
+      where: { accountId },
+    });
     if (!hotel) throw new NotFoundException('Hotel not found');
     return hotel;
   }
