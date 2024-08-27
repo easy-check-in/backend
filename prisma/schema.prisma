@@ -42,10 +42,11 @@ model Hotel {
 
 model Room {
   id           String        @id @default(uuid())
+  number       Int
   hotel        Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   hotelId      String
-  category     Category?     @relation(fields: [categoryId], references: [id])
-  categoryId   String?
+  category     Category      @relation(fields: [categoryId], references: [id])
+  categoryId   String
   reservations Reservation[]
   updatedAt    DateTime      @updatedAt
   createdAt    DateTime      @default(now()) @map("_createdAt")

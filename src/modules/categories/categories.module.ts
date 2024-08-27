@@ -8,5 +8,6 @@ import { CategoriesService } from './categories.service';
   controllers: [CategoriesController],
   providers: [CategoriesService, PrismaService],
   imports: [HotelsModule],
+  exports: [CategoriesService],
 })
 export class CategoriesModule {}

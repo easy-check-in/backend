@@ -4,7 +4,7 @@ import { IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateReservationDto {
   @ApiProperty({
-    description: 'Reservation name',
+    description: 'Nome do autor da reserva',
     example: 'John Doe',
   })
   @IsNotEmpty()
@@ -12,7 +12,7 @@ export class CreateReservationDto {
   name: string;
 
   @ApiProperty({
-    description: 'Reservation email',
+    description: 'Email para a reserva',
     example: 'john.doe@example.com',
   })
   @IsNotEmpty()
@@ -20,7 +20,7 @@ export class CreateReservationDto {
   email: string;
 
   @ApiProperty({
-    description: 'Reservation phone number',
+    description: 'Número de telefone para a reserva',
     example: '+1234567890',
   })
   @IsNotEmpty()
@@ -28,7 +28,7 @@ export class CreateReservationDto {
   phone: string;
 
   @ApiProperty({
-    description: 'Start date of the reservation',
+    description: 'Data de início da reserva',
     example: '2023-07-31T00:00:00.000Z',
   })
   @IsNotEmpty()
@@ -37,7 +37,7 @@ export class CreateReservationDto {
   startDate: Date;
 
   @ApiProperty({
-    description: 'End date of the reservation',
+    description: 'Data de término da reserva',
     example: '2023-08-05T00:00:00.000Z',
   })
   @IsNotEmpty()

@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateHotelDto {
   @ApiProperty({
-    description: 'Hotel name',
+    description: 'Nome do Hotel',
     example: 'Hotel ABC',
   })
   @IsNotEmpty()
@@ -11,24 +11,24 @@ export class CreateHotelDto {
   name: string;
 
   @ApiProperty({
-    description: 'CRN (Commercial Registration Number)',
-    example: '123456789',
+    description: 'CNPJ da Empresa',
+    example: '12345678901234',
   })
   @IsNotEmpty()
   @IsString()
   crn: string;
 
   @ApiProperty({
-    description: 'Hotel email',
-    example: 'hotel@example.com',
+    description: 'Email do Hotel',
+    example: 'hotel@exemplo.com',
   })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
   @ApiProperty({
-    description: 'Hotel phone number',
-    example: '1212341234',
+    description: 'Número de telefone do Hotel',
+    example: '(12) 1234-5678',
   })
   @IsNotEmpty()
   @IsString()
