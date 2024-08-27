@@ -1,17 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateCategoryDto {
   @ApiProperty({
-    description: 'Room capacity',
-    example: '2 persons',
+    description: 'Capacidade do Quarto',
+    example: 2,
   })
   @IsNotEmpty()
-  @IsString()
-  capacity: string;
+  @IsNumber()
+  capacity: number;
 
   @ApiProperty({
-    description: 'Room price',
+    description: 'Preço do quarto',
     example: 100.0,
   })
   @IsNotEmpty()
@@ -19,7 +19,7 @@ export class CreateCategoryDto {
   price: number;
 
   @ApiProperty({
-    description: 'Extra charge for additional person',
+    description: 'Valor adicional por pessoa',
     example: 20.0,
   })
   @IsNotEmpty()

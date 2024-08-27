@@ -13,7 +13,7 @@ export class CreateAccountDto {
   username: string;
 
   @ApiProperty({
-    description: 'User password',
+    description: 'Senha do usuario',
     example: 'mypassword',
   })
   @IsString()
